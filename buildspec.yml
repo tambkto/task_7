@@ -5,8 +5,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI)
-
-      # Generate short Git commit hash for tagging the image
+      - echo Generating image tag from commit hash...
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo Using image tag: $IMAGE_TAG
 
@@ -21,7 +20,6 @@ phases:
       - echo Pushing Docker images to ECR...
       - docker push $ECR_REPO_URI:$IMAGE_TAG
       - docker push $ECR_REPO_URI:latest
-
       - echo Creating imagedefinitions.json for ECS deploy stage...
       - printf '[{"name":"Umar_app_container","imageUri":"%s"}]' "$ECR_REPO_URI:latest" > imagedefinitions.json
 
